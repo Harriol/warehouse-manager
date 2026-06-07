@@ -21,6 +21,7 @@ public class CaptchaConfig {
 
         DefaultKaptcha defaultKaptcha = new DefaultKaptcha();
 
+        //Properties属性集对象 -- 对.properties的文件的封装 -- 理解为是Map
         Properties properties = new Properties();
         //是否有边框 默认为true 我们可以自己设置yes，no
         properties.setProperty("kaptcha.border", "yes");
