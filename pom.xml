@@ -2,55 +2,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <!--
-        控制SpringBoot的版本：
-        方式一：
-        在创建的boot工程的pom文件中使用<parent>标签继承SpringBoot的父工程
-        同时指定版本 == 背后其实也是在指定SpringBoot的父工程继承的SpringBoot
-        版本仲裁中心工程的版本，依赖控制整个SpringBoot所有相关依赖的版本;
-
-        一般是使用idea自带的SPringBoot工程的骨架创建的Boot工程；
-
-        <parent>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-parent</artifactId>
-            <version>4.0.6</version>
-            <relativePath/>
-        </parent>
-
-        方式二：
-        在依赖的版本控制标签<dependencyManagement>中引入SPringBoot版本仲裁中心
-        工程并指定版本 == 也就控制了整个SpringBoot所有相关依赖的版本；
-
-        一般是使用阿里的
-    -->
 
     <groupId>com.pn</groupId>
     <artifactId>warehouse_manager</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>warehouse_manager</name>
     <description>warehouse_manager</description>
-    <url/>
-    <licenses>
-        <license/>
-    </licenses>
-    <developers>
-        <developer/>
-    </developers>
-    <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
-    </scm>
-    <!--声明的依赖的版本号（都是自定义标签）-->
+
     <properties>
-        <java.version>21</java.version>
+        <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring-boot.version>4.0.6</spring-boot.version>
+        <spring-boot.version>2.7.18</spring-boot.version>
     </properties>
-    <!--引入的依赖-->
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -135,7 +100,6 @@
 
     </dependencies>
 
-    <!---->
     <dependencyManagement>
         <dependencies>
             <dependency>
