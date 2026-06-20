@@ -1,9 +1,17 @@
 package com.pn.warehouse_manager.controller;
 
 import com.google.code.kaptcha.Producer;
+import com.pn.warehouse_manager.entity.CurrentUser;
+import com.pn.warehouse_manager.entity.LoginUser;
 import com.pn.warehouse_manager.entity.Result;
+import com.pn.warehouse_manager.entity.User;
+import com.pn.warehouse_manager.service.UserService;
+import com.pn.warehouse_manager.utils.DigestUtil;
+import com.pn.warehouse_manager.utils.TokenUtils;
+import com.pn.warehouse_manager.utils.WarehouseConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,7 +31,6 @@ public class LoginController {
     //注入redis模板
     @Autowired
     private StringRedisTemplate redisTemplate;
-
     /**
      * 生成验证码图片的url接口/captcha/captchaImage
      * @param response
@@ -66,10 +73,49 @@ public class LoginController {
 
     /**
      * 登录的url接口/login
-     * @return
+     * @RequestBody LoginUser loginUser表示接收并封装前端传递的登录用户信息的json数据
+     * 返回值Result对象 -- 表示向前端响应结果对象转的json串，包含响应状态码、成功失败响应、响应信息、响应数据
      */
+    //注入UserService
+    @Autowired
+    private UserService userService;
+    //注入TokenUtils的bean对象
+    @Autowired
+    private TokenUtils tokenUtils;
     @RequestMapping("/login")
-    public Result login(){
-        return Result.ok();
+    public Result login(@RequestBody LoginUser loginUser){
+        //拿到客户输入的验证码
+        String code = loginUser.getVerificationCode();
+        if(!redisTemplate.hasKey(code)){
+            return Result.err(Result.CODE_ERR_BUSINESS,"验证码错误");
+        }
+        //根据账号查询用户
+        User user = userService.queryUserByCode(loginUser.getUserCode());
+        //账号存在
+        if (user != null) {
+            //用户已审核
+            if(user.getUserState().equals(WarehouseConstants.USER_STATE_PASS)){
+                //拿到用户录入的密码
+                String userPwd = loginUser.getUserPwd();
+                //进行md5加密
+                String md5Pwd = DigestUtil.hmacSign(userPwd);
+                //密码合法
+                if(md5Pwd.equals(user.getUserPwd())){
+                    //生成jwt token并存入redis
+                    CurrentUser currentUser =
+                            new CurrentUser(user.getUserId(),user.getUserCode(),user.getUserName());
+                    String token = tokenUtils.loginSign(currentUser, md5Pwd);
+                    //向客户端相应token
+                    return Result.ok("登录成功！",token);
+                }else {
+                    return Result.err(Result.CODE_ERR_BUSINESS,"密码错误！");
+                }
+            }else {
+                //用户未审核
+                return Result.err(Result.CODE_ERR_BUSINESS,"用户未审核！");
+            }
+        }else {
+            return Result.err(Result.CODE_ERR_BUSINESS,"账号不存在！");
+        }
     }
 }

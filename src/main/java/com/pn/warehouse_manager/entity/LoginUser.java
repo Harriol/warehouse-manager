@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * 存储用户登录信息的User类：
+ * 存储当前用户登录信息的User类：
  */
 @Data
 @NoArgsConstructor
