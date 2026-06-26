@@ -12,6 +12,7 @@ import com.pn.warehouse_manager.utils.WarehouseConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,6 +32,7 @@ public class LoginController {
     //注入redis模板
     @Autowired
     private StringRedisTemplate redisTemplate;
+
     /**
      * 生成验证码图片的url接口/captcha/captchaImage
      * @param response
@@ -82,6 +84,7 @@ public class LoginController {
     //注入TokenUtils的bean对象
     @Autowired
     private TokenUtils tokenUtils;
+
     @RequestMapping("/login")
     public Result login(@RequestBody LoginUser loginUser){
         //拿到客户输入的验证码
@@ -117,5 +120,19 @@ public class LoginController {
         }else {
             return Result.err(Result.CODE_ERR_BUSINESS,"账号不存在！");
         }
+    }
+
+    /**获取当前登录的用户的用户信息的url接口/curr-user
+     * 参数@RequestHeader(WarehouseConstants.HEADER_TOKEN_NAME) String token --
+     * 表示将请求头token的值（前端归还的token赋值给请求处理方法入参变量token）;
+     * @param token
+     * @return
+     */
+    @RequestMapping("/curr-user")
+    public Result currentUser(@RequestHeader(WarehouseConstants.HEADER_TOKEN_NAME) String token){
+        //解析token拿到封装了当前登录用户信息的CurrentUser对象
+        CurrentUser currentUser = tokenUtils.getCurrentUser(token);
+        //响应
+        return Result.ok(currentUser);
     }
 }
